@@ -1,0 +1,16 @@
+{
+  "Name": "Warp Sickness - SMAPI Component",
+  "Author": "ASLaneZero",
+  "Version": "1.0.0",
+  "Description": "Detects successful item-based warps and applies Warp Sickness.",
+  "UniqueID": "ASLane.WS.SMAPI",
+  "EntryDll": "WarpSickness.dll",
+  "MinimumApiVersion": "4.0.4",
+  "UpdateKeys": [],
+  "Dependencies": [
+    {
+      "UniqueID": "ASLane.WS",
+      "IsRequired": true
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>WarpSickness</AssemblyName>
+		<RootNamespace>ASLane.WarpSickness</RootNamespace>
+		<ModFolderName>Warp Sickness [SMAPI]</ModFolderName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig"
+						  Version="4.4.0" />
+	</ItemGroup>
+
+</Project>

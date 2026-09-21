@@ -1,0 +1,32 @@
+# Visual Studio local state
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider, if used later
+.idea/
+
+# Compiled .NET output
+[Bb]in/
+[Oo]bj/
+
+# Test and coverage output
+TestResults/
+coverage/
+coverage-results/
+
+# Local build/deployment directories
+_build/
+build/
+artifacts/
+releases/
+
+# Generated SMAPI release packages
+*.zip
+
+# Operating-system clutter
+.DS_Store
+Thumbs.db
+desktop.ini
