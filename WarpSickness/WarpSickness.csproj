@@ -5,13 +5,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AssemblyName>WarpSickness</AssemblyName>
+		<EnableHarmony>true</EnableHarmony>
 		<RootNamespace>ASLane.WarpSickness</RootNamespace>
-		<ModFolderName>Warp Sickness [SMAPI]</ModFolderName>
+		<ModFolderName>[SMAPI] Warp Sickness</ModFolderName>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig"
-						  Version="4.4.0" />
+		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
 	</ItemGroup>
 
 </Project>

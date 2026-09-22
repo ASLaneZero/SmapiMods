@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="ConfigurableJojaUpgrades/ConfigurableJojaUpgrades.csproj" Id="2eb9adb6-8575-47a3-a1f0-51ade4af41d5" />
   <Project Path="WarpSickness/WarpSickness.csproj" Id="1f10d6a9-4415-4ee0-9836-36f9c7d12a6b" />
 </Solution>

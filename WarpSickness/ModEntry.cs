@@ -1,142 +1,121 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Tools;
 using StardewValley.Triggers;
 
 namespace ASLane.WarpSickness
 {
     internal sealed class ModEntry : Mod
     {
-        /// <summary>
-        /// The Content Patcher asset containing the supported warp item IDs.
-        /// </summary>
+        private static ModEntry? Instance;
+
+        // The Content Patcher asset for warp item IDs.
         private const string WarpItemsAssetName =
             "Mods/ASLane.WS/WarpItems";
 
-        /// <summary>
-        /// A cached copy of warp item IDs.
-        /// </summary>
+        // Cached copy of the above.
         private HashSet<string>? cachedWarpItemIds;
-
-        /// <summary>
-        /// When the player most recently attempted to use a supported warp item.
-        /// </summary>
-        private DateTime? pendingWarpStartedAt;
-
-        /// <summary>
-        /// How long to cache the above before discarding.
-        /// </summary>
-        private static readonly TimeSpan WarpConfirmationWindow =
-        TimeSpan.FromSeconds(10);
 
         /// <param name="helper">SMAPI's mod helper.</param>
         public override void Entry(IModHelper helper)
         {
-            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
-            helper.Events.Player.Warped += this.OnWarped;
-            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+            Instance = this;
+
             helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle;
             helper.Events.Content.AssetsInvalidated +=
                 this.OnAssetsInvalidated;
+
+            Harmony harmony = new(this.ModManifest.UniqueID);
+
+            harmony.Patch(
+                original: AccessTools.Method(
+                    typeof(StardewValley.Object),
+                    nameof(StardewValley.Object.performUseAction),
+                    new[] { typeof(GameLocation) }
+                ),
+                postfix: new HarmonyMethod(
+                    typeof(ModEntry),
+                    nameof(AfterObjectPerformUseAction)
+                )
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(
+                    typeof(Wand),
+                    nameof(Wand.DoFunction),
+                    new[]
+                    {
+                        typeof(GameLocation),
+                        typeof(int),
+                        typeof(int),
+                        typeof(int),
+                        typeof(Farmer)
+                    }
+                ),
+                postfix: new HarmonyMethod(
+                    typeof(ModEntry),
+                    nameof(AfterWandDoFunction)
+                )
+            );
         }
 
-        /// <summary>
-        /// Detects the player attempting to use a supported warp item.
-        /// </summary>
-        private void OnButtonPressed(
-            object? sender,
-            ButtonPressedEventArgs e
+        // Warp Totem use.
+        private static void AfterObjectPerformUseAction(
+            StardewValley.Object __instance,
+            bool __result
         )
+        {
+            if (!__result || Instance is null)
+                return;
+
+            Instance.HandleSuccessfulWarpItemUse(__instance);
+        }
+
+        // Return Scepter use.
+        private static void AfterWandDoFunction(
+            Wand __instance,
+            Farmer who
+        )
+        {
+            if (Instance is null || !who.IsLocalPlayer)
+                return;
+
+            Instance.HandleSuccessfulWarpItemUse(__instance);
+        }
+
+        // Warp Sickness application.
+        private void HandleSuccessfulWarpItemUse(Item item)
         {
             if (!Context.IsWorldReady)
                 return;
 
-            if (!e.Button.IsUseToolButton())
+            if (!this.GetWarpItemIds().Contains(item.QualifiedItemId))
                 return;
 
-            Item? item = Game1.player.CurrentItem;
-
-            if (item is null)
-                return;
-
-            HashSet<string> supportedItems = this.GetWarpItemIds();
-
-            if (!supportedItems.Contains(item.QualifiedItemId))
-                return;
-
-            this.pendingWarpStartedAt = DateTime.UtcNow;
+            this.ApplyWarpSickness();
 
             this.Monitor.Log(
-                $"Detected activation of {item.QualifiedItemId}; "
-                + "waiting to confirm a warp.",
-                LogLevel.Trace
+                $"Successful use of {item.QualifiedItemId}; "
+                + "applied warp sickness.",
+                LogLevel.Info
             );
         }
 
-        /// <summary>
-        /// Applies the debuffs after a supported item causes a warp.
-        /// </summary>
-        private void OnWarped(
-    object? sender,
-    WarpedEventArgs e
-)
-        {
-            if (!e.Player.IsLocalPlayer)
-                return;
-
-            if (this.pendingWarpStartedAt is null)
-                return;
-
-            TimeSpan elapsed =
-                DateTime.UtcNow - this.pendingWarpStartedAt.Value;
-
-            if (elapsed <= WarpConfirmationWindow)
-            {
-                this.ApplyWarpSickness();
-
-                this.Monitor.Log(
-                    $"Applied warp sickness after arriving in "
-                    + $"{e.NewLocation.NameOrUniqueName}.",
-                    LogLevel.Trace
-                );
-            }
-
-            this.pendingWarpStartedAt = null;
-        }
-
-        private void OnUpdateTicked(
-            object? sender,
-            UpdateTickedEventArgs e
-        )
-        {
-            if (this.pendingWarpStartedAt is null)
-                return;
-
-            TimeSpan elapsed =
-                DateTime.UtcNow - this.pendingWarpStartedAt.Value;
-
-            if (elapsed > WarpConfirmationWindow)
-                this.pendingWarpStartedAt = null;
-        }
-
-        /// <summary>
-        /// Clears temporary state when returning to the title screen.
-        /// </summary>
+        // Title Screen state clear.
         private void OnReturnedToTitle(
             object? sender,
             ReturnedToTitleEventArgs e
         )
         {
-            this.pendingWarpStartedAt = null;
             this.cachedWarpItemIds = null;
         }
 
-        /// <summary>
-        /// Updates the cached warp item list from Content Patcher.
-        /// </summary>
+        // Warp item list expiry.
         private void OnAssetsInvalidated(
             object? sender,
             AssetsInvalidatedEventArgs e
@@ -159,9 +138,8 @@ namespace ASLane.WarpSickness
             );
         }
 
-        /// <summary>
-        /// Gets the item IDs registered in the Content Patcher asset.
-        /// </summary>
+        // Warp item list update.
+
         private HashSet<string> GetWarpItemIds()
         {
             if (this.cachedWarpItemIds is null)
@@ -186,9 +164,7 @@ namespace ASLane.WarpSickness
             return this.cachedWarpItemIds;
         }
 
-        /// <summary>
-        /// Applies the Warp Sickness debuffs
-        /// </summary>
+        // Applies debuffs
         private void ApplyWarpSickness()
         {
             this.RunTriggerAction(
@@ -204,9 +180,7 @@ namespace ASLane.WarpSickness
             );
         }
 
-        /// <summary>
-        /// Runs trigger action.
-        /// </summary>
+        // Runs trigger action.
         private void RunTriggerAction(string action)
         {
             bool succeeded =

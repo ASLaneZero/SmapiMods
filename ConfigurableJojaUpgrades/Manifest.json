@@ -1,0 +1,20 @@
+{
+  "Name": "Configurable Joja Development Prices - SMAPI Component",
+  "Author": "ASLaneZero",
+  "Version": "1.0.0",
+  "Description": "Makes the Joja membership, development, and Movie Theater prices configurable.",
+  "UniqueID": "ASLane.ConfigurableJojaPrices.SMAPI",
+  "EntryDll": "ConfigurableJojaPrices.dll",
+  "MinimumApiVersion": "4.0.4",
+  "UpdateKeys": [],
+  "Dependencies": [
+    {
+      "UniqueID": "spacechase0.GenericModConfigMenu",
+      "IsRequired": false
+    },
+    {
+      "UniqueID": "Pathoschild.ContentPatcher",
+      "IsRequired": false
+    }
+  ]
+}
