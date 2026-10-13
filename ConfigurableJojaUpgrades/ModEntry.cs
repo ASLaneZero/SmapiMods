@@ -18,6 +18,7 @@ internal sealed class ModEntry : Mod
         ActiveConfig = helper.ReadConfig<ModConfig>();
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
 
+        // Error handling
         MethodInfo? target = AccessTools.Method(typeof(JojaCDMenu), "getPriceFromButtonNumber");
         if (target is null)
         {
@@ -43,7 +44,7 @@ internal sealed class ModEntry : Mod
 
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
-        // Register Content Patcher tokens.
+        // Register Content Patcher tokens
         IContentPatcherApi? contentPatcher =
             this.Helper.ModRegistry.GetApi<IContentPatcherApi>(
                 "Pathoschild.ContentPatcher"
@@ -70,7 +71,7 @@ internal sealed class ModEntry : Mod
             }
         );
 
-        // Existing GMCM registration.
+        // Existing GMCM registration
         IGenericModConfigMenuApi? gmcm =
             this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>(
                 "spacechase0.GenericModConfigMenu"
@@ -85,33 +86,42 @@ internal sealed class ModEntry : Mod
             save: () => this.Helper.WriteConfig(ActiveConfig)
         );
 
-        gmcm.AddSectionTitle(this.ModManifest, () => "Joja membership");
+        gmcm.AddSectionTitle(
+            this.ModManifest,
+            () => this.Helper.Translation.Get("config.section.membership")
+        );
         this.AddPriceOption(gmcm, () => ActiveConfig.Membership, value => ActiveConfig.Membership = value,
-            "Membership", "The cost of purchasing a Joja membership.");
+            "config.membership.name", "config.membership.description");
 
-        gmcm.AddSectionTitle(this.ModManifest, () => "Community Development Form");
+        gmcm.AddSectionTitle(
+            this.ModManifest,
+            () => this.Helper.Translation.Get("config.section.developments")
+        );
         this.AddPriceOption(gmcm, () => ActiveConfig.Minecarts, value => ActiveConfig.Minecarts = value,
-            "Minecarts", "The cost of repairing the minecart system.");
+            "config.minecarts.name", "config.minecarts.description");
         this.AddPriceOption(gmcm, () => ActiveConfig.Panning, value => ActiveConfig.Panning = value,
-            "Panning", "The cost of removing the Glittering Boulder.");
+            "config.panning.name", "config.panning.description");
         this.AddPriceOption(gmcm, () => ActiveConfig.QuarryBridge, value => ActiveConfig.QuarryBridge = value,
-            "Quarry Bridge", "The cost of repairing the bridge to the quarry.");
+            "config.quarry-bridge.name", "config.quarry-bridge.description");
         this.AddPriceOption(gmcm, () => ActiveConfig.Greenhouse, value => ActiveConfig.Greenhouse = value,
-            "Greenhouse", "The cost of repairing the greenhouse.");
+            "config.greenhouse.name", "config.greenhouse.description");
         this.AddPriceOption(gmcm, () => ActiveConfig.Bus, value => ActiveConfig.Bus = value,
-            "Bus", "The cost of repairing the bus.");
+            "config.bus.name", "config.bus.description");
 
-        gmcm.AddSectionTitle(this.ModManifest, () => "Movie Theater");
+        gmcm.AddSectionTitle(
+            this.ModManifest,
+            () => this.Helper.Translation.Get("config.section.theater")
+        );
         this.AddPriceOption(gmcm, () => ActiveConfig.MovieTheater, value => ActiveConfig.MovieTheater = value,
-            "Movie Theater", "The cost of converting the abandoned Community Center into a Movie Theater.");
+            "config.theater.name", "config.theater.description");
     }
 
     private void AddPriceOption(
         IGenericModConfigMenuApi gmcm,
         Func<int> getValue,
         Action<int> setValue,
-        string name,
-        string tooltip
+        string nameKey,
+        string tooltipKey
     )
     {
         gmcm.AddTextOption(
@@ -129,8 +139,8 @@ internal sealed class ModEntry : Mod
                     setValue(parsed);
                 }
             },
-            name: () => name,
-            tooltip: () => $"{tooltip} Enter a non-negative whole number."
+            name: () => this.Helper.Translation.Get(nameKey),
+            tooltip: () => this.Helper.Translation.Get(tooltipKey)
         );
     }
 

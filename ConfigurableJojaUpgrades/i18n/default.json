@@ -1,0 +1,19 @@
+{
+  "config.section.membership": "Joja membership",
+  "config.section.developments": "Community Development Form",
+  "config.section.theater": "Movie Theater",
+  "config.membership.name": "Membership",
+  "config.membership.description": "The cost of purchasing a Joja membership. Enter a non-negative whole number.",
+  "config.minecarts.name": "Minecarts",
+  "config.minecarts.description": "The cost of repairing the minecart system. Enter a non-negative whole number.",
+  "config.panning.name": "Panning",
+  "config.panning.description": "The cost of removing the Glittering Boulder. Enter a non-negative whole number.",
+  "config.quarry-bridge.name": "Quarry Bridge",
+  "config.quarry-bridge.description": "The cost of repairing the bridge to the quarry. Enter a non-negative whole number.",
+  "config.greenhouse.name": "Greenhouse",
+  "config.greenhouse.description": "The cost of repairing the greenhouse. Enter a non-negative whole number.",
+  "config.bus.name": "Bus",
+  "config.bus.description": "The cost of repairing the bus. Enter a non-negative whole number.",
+  "config.theater.name": "Movie Theater",
+  "config.theater.description": "The cost of converting the abandoned Community Center into a Movie Theater. Enter a non-negative whole number."
+}

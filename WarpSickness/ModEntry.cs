@@ -21,7 +21,7 @@ namespace ASLane.WarpSickness
         // Cached copy of the above.
         private HashSet<string>? cachedWarpItemIds;
 
-        /// <param name="helper">SMAPI's mod helper.</param>
+        // SMAPI's mod helper.
         public override void Entry(IModHelper helper)
         {
             Instance = this;

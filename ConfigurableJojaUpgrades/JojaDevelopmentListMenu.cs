@@ -5,7 +5,7 @@ using StardewValley.Menus;
 
 namespace ConfigurableJojaPrices;
 
-/// <summary>Draws the original JojaCDMenu checkboxes as a text list.</summary>
+// Draws the original JojaCDMenu checkboxes as list
 internal static class JojaDevelopmentListMenu
 {
     private const int MenuWidth = 760;
